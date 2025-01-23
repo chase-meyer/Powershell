@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## Welcome to dotnet sdk
 
 This repository contains core functionality needed to create .NET projects that are shared between Visual Studio and the [.NET CLI](https://learn.microsoft.com/dotnet/core/tools/).
@@ -96,3 +97,7 @@ For PRs, we assign a reviewer once a week on Wednesday, looking only at PRs that
 The .NET SDK project uses the [MIT license](LICENSE.TXT).
 
 The *LICENSE.txt* and *ThirdPartyNotices.txt* in any downloaded archives are authoritative.
+=======
+# Powershell
+Powershell setup and useful scripts
+>>>>>>> origin/main

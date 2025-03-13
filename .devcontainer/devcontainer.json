@@ -1,0 +1,18 @@
+{
+    "name": "PowerShell Dev Container",
+    "image": "mcr.microsoft.com/powershell",
+    "settings": {
+        "terminal.integrated.shell.linux": "/usr/bin/pwsh",
+        "workbench.colorTheme": "PowerShell ISE"
+    },
+    "extensions": [
+        "ms-vscode.powershell",
+        "ms-vscode.Theme-PowerShell",
+        "vscodevim.vim"
+    ],
+    "postCreateCommand": "pwsh -NoProfile -Command ./setup.ps1",
+    "mounts": [
+        "source=${localWorkspaceFolder}/scripts,target=/workspace/scripts,type=bind"
+    ],
+    "remoteUser": "vscode"
+}

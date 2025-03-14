@@ -16,5 +16,5 @@
     "mounts": [
         "source=${localWorkspaceFolder}/scripts,target=/workspace/scripts,type=bind"
     ],
-    "remoteUser": "root"
+    "remoteUser": "vscode"
 }

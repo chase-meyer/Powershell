@@ -1,0 +1,6 @@
+[
+    {
+        "Name": "ExecutionPolicy",
+        "Value": "RemoteSigned"
+    }
+]

@@ -1,6 +1,8 @@
 {
     "name": "PowerShell Dev Container",
-    "image": "mcr.microsoft.com/powershell",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
     "settings": {
         "terminal.integrated.shell.linux": "/usr/bin/pwsh",
         "workbench.colorTheme": "PowerShell ISE"
@@ -14,5 +16,5 @@
     "mounts": [
         "source=${localWorkspaceFolder}/scripts,target=/workspace/scripts,type=bind"
     ],
-    "remoteUser": "vscode"
+    "remoteUser": "root"
 }

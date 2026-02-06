@@ -4,11 +4,6 @@ param(
     [switch]$InstallPwshIfMissing = $true
 )
 
-Add-Type -AssemblyName System.Runtime.InteropServices
-$IsWindows = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
-$IsLinux   = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Linux)
-$IsMacOS   = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::OSX)
-
 function Ensure-Pwsh {
     if (Get-Command pwsh -ErrorAction SilentlyContinue) { return }
 
@@ -74,7 +69,14 @@ $profileLines += ''
 $profileLines += '# Add scripts dir to PATH if not already included'
 $profileLines += "if (-not ((\$env:PATH -split [IO.Path]::PathSeparator) -contains '$targetScriptDir')) { [System.Environment]::SetEnvironmentVariable('PATH', \$env:PATH + [IO.Path]::PathSeparator + '$targetScriptDir', [System.EnvironmentVariableTarget]::User) }"
 
-Set-Content -Path $profilePath -Value $profileLines
+if ($profilePath) {
+    $profileDir = Split-Path -Path $profilePath -Parent
+    if ($profileDir -and -not (Test-Path $profileDir)) {
+        New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
+    }
+
+    Set-Content -Path $profilePath -Value $profileLines
+}
 
 Write-Host "PowerShell profile configured successfully!"
 
@@ -88,7 +90,12 @@ if ($IsWindows) {
 
 # Configure settings
 Write-Host "Configuring settings..."
-& (Join-Path $scriptRoot 'configure-settings.ps1')
+$configureScript = Join-Path $scriptRoot 'configure-settings.ps1'
+if (Test-Path $configureScript) {
+    & $configureScript
+} else {
+    Write-Warning "configure-settings.ps1 not found at $configureScript"
+}
 
 Write-Host "Custom scripts copied and PATH updated successfully!"
 Write-Host "Setup complete! Please restart your PowerShell session to apply the profile settings."

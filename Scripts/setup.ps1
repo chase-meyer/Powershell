@@ -58,7 +58,7 @@ $profileLines += '# Custom profile settings'
 $profileLines += ''
 $profileLines += '$emojis = @(''️❤️'', ''👽'', ''💩'', ''🍄'', ''👻'', ''🐷'', ''🥓'', ''🌮'', ''💣'', ''🚒'', ''🚓'', ''🚢'', ''🚕'', ''🚌'', ''🚂'', ''🚛'', ''🍇'', ''🍈'', ''🍉'', ''🍊'', ''🍋'', ''🍌'', ''🍍'', ''🥭'', ''🍎'', ''🍏'', ''🍐'', ''🍑'', ''🍒'', ''🍓'', ''🥝'', ''🍅'', ''🥥'', ''🥑'', ''🥒'', ''🥦'', ''🫑'', ''🌵'', ''🐫'', ''🦖'', ''🐳'', ''🐓'', ''🐵'')'
 $profileLines += '$randomEmoji = $emojis[(Get-Random -Minimum 0 -Maximum $emojis.Length)]'
-$profileLines += "$poshThemePath = '$poshThemePath'"
+$profileLines += "`$poshThemePath = '$poshThemePath'"
 $profileLines += 'if (Test-Path $poshThemePath) {'
 $profileLines += '    $theme = Get-Content -Path $poshThemePath -Raw | ConvertFrom-Json -AsHashtable'
 $profileLines += '    $theme.blocks.segments[7].template = $randomEmoji'

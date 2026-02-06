@@ -1,92 +1,94 @@
 # Main setup script
 
-# Define the profile path
+param(
+    [switch]$InstallPwshIfMissing = $true
+)
+
+Add-Type -AssemblyName System.Runtime.InteropServices
+$IsWindows = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
+$IsLinux   = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Linux)
+$IsMacOS   = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::OSX)
+
+function Ensure-Pwsh {
+    if (Get-Command pwsh -ErrorAction SilentlyContinue) { return }
+
+    if (-not $InstallPwshIfMissing) {
+        Write-Warning "'pwsh' (PowerShell 7+) not found. Re-run with -InstallPwshIfMissing to attempt install."
+        return
+    }
+
+    if ($IsWindows) {
+        $winget = Get-Command winget -ErrorAction SilentlyContinue
+        if ($winget) {
+            Write-Host "Installing PowerShell 7 via winget..."
+            winget install --id Microsoft.PowerShell --source winget --scope user --accept-package-agreements --accept-source-agreements
+        } else {
+            Write-Warning "'pwsh' not found and winget not available. Install PowerShell 7 manually: https://aka.ms/powershell-release"
+        }
+    } elseif ($IsLinux) {
+        Write-Warning "'pwsh' not found. Install PowerShell 7 via your package manager (e.g., sudo apt-get install powershell) or see https://aka.ms/powershell-release."
+    } elseif ($IsMacOS) {
+        Write-Warning "'pwsh' not found. Install PowerShell 7 via Homebrew: brew install --cask powershell"
+    }
+}
+
+Ensure-Pwsh
+
+$scriptRoot = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
 $profilePath = $PROFILE
 
-# Create or update the profile script
 Write-Host "Configuring PowerShell profile at $profilePath..."
 
-# Profile content
-$profileContent = @"
-# Custom profile settings
+# Theme path detection for Windows, Linux, WSL
+$poshThemesRoot = if ($env:POSH_THEMES_PATH) {
+    $env:POSH_THEMES_PATH
+} elseif ($IsWindows) {
+    Join-Path ([System.Environment]::GetFolderPath('LocalApplicationData')) 'Programs\oh-my-posh\themes'
+} else {
+    "$HOME/.poshthemes"
+}
+$poshThemePath = Join-Path $poshThemesRoot 'theme.omp.json'
 
-# Get random emoji for Oh My Posh theme prompt
-$emojis = @('️❤️', '👽', '💩', '🍄', '👻', '🐷', '🥓', '🌮', '💣', '🚒', '🚓', '🚢', '🚕', '🚌', '🚂', '🚛', '🍇', '🍈', '🍉', '🍊', '🍋', '🍌', '🍍', '🥭', '🍎', '🍏', '🍐', '🍑', '🍒', '🍓', '🥝', '🍅', '🥥', '🥑', '🥒', '🥦', '🫑', '🌵', '🐫', '🦖', '🐳', '🐓', '🐵')
-$randomEmoji = $emojis[(Get-Random -Minimum 0 -Maximum $emojis.Length)]
+# Where to place helper scripts
+$targetScriptDir = if ($IsWindows) { Join-Path $HOME 'Documents\PowerShell\Scripts' } else { "$HOME/bin" }
+if (-not (Test-Path -Path $targetScriptDir)) {
+    New-Item -ItemType Directory -Path $targetScriptDir -Force | Out-Null
+}
 
-# path to the Oh My Posh theme file
-$homeDir = [System.Environment]::GetFolderPath('UserProfile')
-$path = "$homeDir\AppData\Local\Programs\oh-my-posh\themes\theme.omp.json"
+# Copy local scripts to the target script dir (case-safe path)
+Copy-Item -Path (Join-Path $scriptRoot '*.ps1') -Destination $targetScriptDir -Force
 
-# Update the Oh My Posh theme with the random emoji
-$theme = Get-Content -Path $path -Raw | ConvertFrom-Json -AsHashtable
-$theme.blocks.segments[7].template = $randomEmoji
-$theme | ConvertTo-Json -Depth 100 | Set-Content -Path $path
+$profileLines = @()
+$profileLines += '# Custom profile settings'
+$profileLines += ''
+$profileLines += '$emojis = @(''️❤️'', ''👽'', ''💩'', ''🍄'', ''👻'', ''🐷'', ''🥓'', ''🌮'', ''💣'', ''🚒'', ''🚓'', ''🚢'', ''🚕'', ''🚌'', ''🚂'', ''🚛'', ''🍇'', ''🍈'', ''🍉'', ''🍊'', ''🍋'', ''🍌'', ''🍍'', ''🥭'', ''🍎'', ''🍏'', ''🍐'', ''🍑'', ''🍒'', ''🍓'', ''🥝'', ''🍅'', ''🥥'', ''🥑'', ''🥒'', ''🥦'', ''🫑'', ''🌵'', ''🐫'', ''🦖'', ''🐳'', ''🐓'', ''🐵'')'
+$profileLines += '$randomEmoji = $emojis[(Get-Random -Minimum 0 -Maximum $emojis.Length)]'
+$profileLines += "$poshThemePath = '$poshThemePath'"
+$profileLines += 'if (Test-Path $poshThemePath) {'
+$profileLines += '    $theme = Get-Content -Path $poshThemePath -Raw | ConvertFrom-Json -AsHashtable'
+$profileLines += '    $theme.blocks.segments[7].template = $randomEmoji'
+$profileLines += '    $theme | ConvertTo-Json -Depth 100 | Set-Content -Path $poshThemePath'
+$profileLines += '}'
+$profileLines += 'oh-my-posh init pwsh --config $poshThemePath | Invoke-Expression'
+$profileLines += ''
+$profileLines += '# Add scripts dir to PATH if not already included'
+$profileLines += "if (-not ((\$env:PATH -split [IO.Path]::PathSeparator) -contains '$targetScriptDir')) { [System.Environment]::SetEnvironmentVariable('PATH', \$env:PATH + [IO.Path]::PathSeparator + '$targetScriptDir', [System.EnvironmentVariableTarget]::User) }"
 
-# Initialize
-oh-my-posh init pwsh --config $path | Invoke-Expression
-"@
-
-# Write the profile content to the profile script
-Set-Content -Path $profilePath -Value $profileContent
+Set-Content -Path $profilePath -Value $profileLines
 
 Write-Host "PowerShell profile configured successfully!"
 
-# Install Oh My Posh
-Write-Host "Installing Oh My Posh..."
-./install-ohmyposh.ps1
+# Install Oh My Posh (Windows script), otherwise expect it to be installed via package manager
+if ($IsWindows) {
+    Write-Host "Installing Oh My Posh..."
+    & (Join-Path $scriptRoot 'install-ohmyposh.ps1')
+} else {
+    Write-Host "Skipping install-ohmyposh.ps1 (install oh-my-posh via your package manager or curl script on WSL)."
+}
 
 # Configure settings
 Write-Host "Configuring settings..."
-./configure-settings.ps1
-
-# Determine the operating system
-$osPlatform = [System.Environment]::OSVersion.Platform
-
-if ($osPlatform -eq [System.PlatformID]::Unix -or $osPlatform -eq [System.PlatformID]::MacOSX) {
-    # Linux or macOS
-    $binPath = "$HOME/bin"
-    if (-not (Test-Path -Path $binPath)) {
-        New-Item -ItemType Directory -Path $binPath
-    }
-
-    Write-Host "Copying custom scripts to $binPath..."
-    Copy-Item -Path ./scripts/*.ps1 -Destination $binPath -Force
-
-    # Ensure ~/bin is in the PATH
-    $profileContent += @"
-# Add ~/bin to PATH if not already included
-if (-not (\$env:PATH -contains "$binPath")) {
-    [System.Environment]::SetEnvironmentVariable("PATH", "\$env:PATH;$binPath", [System.EnvironmentVariableTarget]::User)
-}
-"@
-} elseif ($osPlatform -eq [System.PlatformID]::Win32NT) {
-    # Windows
-    $scriptsPath = "$HOME\Documents\WindowsPowerShell\Scripts"
-    if (-not (Test-Path -Path $scriptsPath)) {
-        New-Item -ItemType Directory -Path $scriptsPath
-    }
-
-    Write-Host "Copying custom scripts to $scriptsPath..."
-    Copy-Item -Path ./scripts/*.ps1 -Destination $scriptsPath -Force
-
-    # Ensure the scripts path is in the PATH
-    $profileContent += @"
-# Add $scriptsPath to PATH if not already included
-if (-not (\$env:PATH -contains "$scriptsPath")) {
-    [System.Environment]::SetEnvironmentVariable("PATH", "\$env:PATH;$scriptsPath", [System.EnvironmentVariableTarget]::User)
-}
-"@
-}
-
-# Write the updated profile content to the profile script
-Set-Content -Path $profilePath -Value $profileContent
+& (Join-Path $scriptRoot 'configure-settings.ps1')
 
 Write-Host "Custom scripts copied and PATH updated successfully!"
-
-# Run additional scripts if needed
-# Write-Host "Running additional scripts..."
-# ./script1.ps1
-# ./script2.ps1
-
 Write-Host "Setup complete! Please restart your PowerShell session to apply the profile settings."

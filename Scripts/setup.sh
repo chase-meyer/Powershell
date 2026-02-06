@@ -52,10 +52,31 @@ copy_theme() {
   fi
 }
 
+ensure_bashrc_pwsh() {
+  local bashrc="${HOME}/.bashrc"
+  local marker_start="# >>> pwsh-auto >>>"
+  local marker_end="# <<< pwsh-auto <<<"
+
+  if grep -Fq "$marker_start" "$bashrc" 2>/dev/null; then
+    echo "pwsh auto-launch already present in .bashrc"
+    return
+  fi
+
+  cat <<'EOF' >> "$bashrc"
+# >>> pwsh-auto >>>
+if [ -t 1 ] && command -v pwsh >/dev/null 2>&1; then
+  exec pwsh
+fi
+# <<< pwsh-auto <<<
+EOF
+  echo "Added pwsh auto-launch to .bashrc"
+}
+
 main() {
   ensure_pwsh
   ensure_oh_my_posh
   copy_theme
+  ensure_bashrc_pwsh
 
   echo "Running PowerShell setup..."
   pwsh "${REPO_ROOT}/Scripts/setup.ps1" -InstallPwshIfMissing:\$false

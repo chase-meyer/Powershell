@@ -1,0 +1,30 @@
+# OS / editor cruft
+Thumbs.db
+Desktop.ini
+*.tmp
+*.log
+.history/
+.DS_Store
+*.code-workspace
+
+# VS Code settings (keep project-level configs elsewhere)
+.vscode/
+
+# Environment and secrets
+.env
+.env.*
+*.secret
+*.secrets
+
+# PowerShell modules and gallery caches (keep install scripts + lock files)
+Modules/
+Scripts/InstalledScriptInfos/
+*.nupkg
+*.zip
+
+# Test and coverage output
+TestResults/
+coverage/
+*.coverage*
+*.trx
+

@@ -1,2 +1,2 @@
 # Powershell
-Powershell setup and useful scripts
+My powershell setup. 

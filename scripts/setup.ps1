@@ -16,7 +16,7 @@ $randomEmoji = $emojis[(Get-Random -Minimum 0 -Maximum $emojis.Length)]
 
 # path to the Oh My Posh theme file
 $homeDir = [System.Environment]::GetFolderPath('UserProfile')
-$path = "$homeDir\AppData\Local\Programs\oh-my-posh\themes\mytheme.omp.json"
+$path = "$homeDir\AppData\Local\Programs\oh-my-posh\themes\theme.omp.json"
 
 # Update the Oh My Posh theme with the random emoji
 $theme = Get-Content -Path $path -Raw | ConvertFrom-Json -AsHashtable
@@ -85,8 +85,8 @@ Set-Content -Path $profilePath -Value $profileContent
 Write-Host "Custom scripts copied and PATH updated successfully!"
 
 # Run additional scripts if needed
-Write-Host "Running additional scripts..."
-./script1.ps1
-./script2.ps1
+# Write-Host "Running additional scripts..."
+# ./script1.ps1
+# ./script2.ps1
 
 Write-Host "Setup complete! Please restart your PowerShell session to apply the profile settings."

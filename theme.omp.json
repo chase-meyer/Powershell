@@ -1,0 +1,116 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "blocks": [
+    {
+      "alignment": "left",
+      "segments": [
+        {
+          "foreground": "#738769",
+          "style": "plain",
+          "template": "┏[<#ffffff></> {{ .UserName }} from <#ffffff></> {{ .HostName }}]",
+          "type": "session"
+        },
+        {
+          "foreground": "#C87C5B",
+          "properties": {
+            "style": "dallas",
+            "threshold": 0
+          },
+          "style": "diamond",
+          "template": "[<#ffffff></> {{ .FormattedMs }}s]",
+          "type": "executiontime"
+        },
+        {
+          "properties": {
+            "root_icon": ""
+          },
+          "style": "diamond",
+          "template": "",
+          "type": "root"
+        },
+        {
+          "foreground": "#9EB5A0",
+          "style": "diamond",
+          "template": "[<#ffffff></> RAM: {{ (div ((sub .PhysicalTotalMemory .PhysicalFreeMemory)|float64) 1073741824.0) }}/{{ (div .PhysicalTotalMemory 1073741824.0) }}GB]",
+          "type": "sysinfo"
+        },
+        {
+          "foreground": "#738769",
+          "properties": {
+            "time_format": "Monday at 3:04:05 PM"
+          },
+          "style": "diamond",
+          "template": "[<#ffffff></> {{ .CurrentDate | date .Format }}]",
+          "type": "time"
+        },
+        {
+          "foreground": "#C87C5B",
+          "properties": {
+            "fetch_stash_count": true,
+            "fetch_status": true,
+            "fetch_upstream_icon": true
+          },
+          "style": "plain",
+          "template": "[<#ffffff>{{ .UpstreamIcon }}</>{{ .HEAD }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Working.Changed }} <#ffffff></> {{ .Working.String }}{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }} <#ffffff></> {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0 }} <#ffffff></> {{ .StashCount }}{{ end }}]",
+          "type": "git"
+        },
+        {
+          "foreground": "#A8754C",
+          "style": "plain",
+          "template": "[{{ .Profile }}{{if .Region}}@{{ .Region }}{{ end }}]",
+          "type": "aws"
+        },
+        {
+          "foreground": "#A8754C",
+          "style": "plain",
+          "template": "[{{.Context}}{{if .Namespace}} :: {{.Namespace}}{{end}}]",
+          "type": "kubectl"
+        },
+        {
+          "foreground": "#7A2E2E",
+          "style": "plain",
+          "template": "[]",
+          "type": "root"
+        },
+        {
+          "foreground": "#7A2E2E",
+          "style": "powerline",
+          "template": "[<#ffffff></> Error, check your command]",
+          "type": "status"
+        }
+      ],
+      "type": "prompt"
+    },
+    {
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "foreground": "#738769",
+          "properties": {
+            "style": "full"
+          },
+          "style": "plain",
+          "template": "┖[<#9EB5A0>{{ .Path }}</>]",
+          "type": "path"
+        }
+      ],
+      "type": "prompt"
+    },
+    {
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "foreground": "#738769",
+          "style": "plain",
+          "template": "🚓",
+          "type": "text"
+        }
+      ],
+      "type": "prompt"
+    }
+  ],
+  "final_space": true,
+  "version": 2
+}

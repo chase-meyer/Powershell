@@ -1,0 +1,4 @@
+AzureAD,2.0.2.182
+dbatools,2.1.7
+dbatools.library,2023.9.21
+SqlServer,22.3.0

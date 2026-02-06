@@ -1,0 +1,4 @@
+AzureAD
+dbatools
+dbatools.library
+SqlServer

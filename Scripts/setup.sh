@@ -58,7 +58,7 @@ main() {
   copy_theme
 
   echo "Running PowerShell setup..."
-  pwsh "${REPO_ROOT}/Scripts/setup.ps1" -InstallPwshIfMissing:$false
+  pwsh "${REPO_ROOT}/Scripts/setup.ps1" -InstallPwshIfMissing:\$false
 
   if [ -f "${REPO_ROOT}/Scripts/install-modules.ps1" ]; then
     echo "Installing modules from pinned list..."

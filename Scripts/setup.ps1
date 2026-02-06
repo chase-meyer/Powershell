@@ -67,7 +67,7 @@ $profileLines += '}'
 $profileLines += 'oh-my-posh init pwsh --config $poshThemePath | Invoke-Expression'
 $profileLines += ''
 $profileLines += '# Add scripts dir to PATH if not already included'
-$profileLines += "if (-not ((\$env:PATH -split [IO.Path]::PathSeparator) -contains '$targetScriptDir')) { [System.Environment]::SetEnvironmentVariable('PATH', \$env:PATH + [IO.Path]::PathSeparator + '$targetScriptDir', [System.EnvironmentVariableTarget]::User) }"
+$profileLines += "if (-not ((`$env:PATH -split [IO.Path]::PathSeparator) -contains '$targetScriptDir')) { [System.Environment]::SetEnvironmentVariable('PATH', `$env:PATH + [IO.Path]::PathSeparator + '$targetScriptDir', [System.EnvironmentVariableTarget]::User) }"
 
 if ($profilePath) {
     $profileDir = Split-Path -Path $profilePath -Parent
